@@ -21,7 +21,7 @@ function GameObject:init(def, x, y)
 
     self.defaultState = def.defaultState
     self.state = self.defaultState
-    self.states = def.states
+    self.states = def.states or {}
 
     -- dimensions
     self.x = x

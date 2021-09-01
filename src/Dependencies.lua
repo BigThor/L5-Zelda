@@ -11,6 +11,7 @@ require 'src/Animation'
 require 'src/constants'
 require 'src/Entity'
 require 'src/entity_defs'
+require 'src/game_consumables'
 require 'src/GameObject'
 require 'src/game_objects'
 require 'src/Hitbox'
@@ -67,6 +68,7 @@ gFonts = {
 gSounds = {
     ['music'] = love.audio.newSource('sounds/music.mp3', 'static'),
     ['sword'] = love.audio.newSource('sounds/sword.wav', 'static'),
+    ['heart-pickup'] = love.audio.newSource('sounds/heart_pickup.wav', 'static'),
     ['hit-enemy'] = love.audio.newSource('sounds/hit_enemy.wav', 'static'),
     ['hit-player'] = love.audio.newSource('sounds/hit_player.wav', 'static'),
     ['door'] = love.audio.newSource('sounds/door.wav', 'static')

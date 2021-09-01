@@ -21,6 +21,8 @@ TILE_SIZE = 16
 --
 PLAYER_WALK_SPEED = 60
 
+HEART_DROPRATE = 10
+
 --
 -- map constants
 --

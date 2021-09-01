@@ -23,6 +23,9 @@ function Room:init(player)
     self.objects = {}
     self:generateObjects()
 
+    -- game consumables in the room
+    self.consumables = {}
+
     -- doorways that lead to other dungeon rooms
     self.doorways = {}
     table.insert(self.doorways, Doorway('top', false, self))
@@ -158,6 +161,11 @@ function Room:update(dt)
 
         -- remove entity from the table if health is <= 0
         if entity.health <= 0 then
+            -- possibly spawn heart when changes to dead
+            if not entity.dead and math.random(HEART_DROPRATE) == 1 then
+                self:generateHeart(entity.x, entity.y)
+            end
+            
             entity.dead = true
         elseif not entity.dead then
             entity:processAI({room = self}, dt)
@@ -184,6 +192,16 @@ function Room:update(dt)
             object:onCollide()
         end
     end
+
+    for k, consumable in pairs(self.consumables) do
+        consumable:update(dt)
+
+        -- trigger collision callback on object
+        if self.player:collides(consumable) then
+            consumable:onConsume()
+            table.remove(self.consumables, k)
+        end
+    end
 end
 
 function Room:render()
@@ -203,6 +221,10 @@ function Room:render()
     end
 
     for k, object in pairs(self.objects) do
+        object:render(self.adjacentOffsetX, self.adjacentOffsetY)
+    end
+
+    for k, object in pairs(self.consumables) do
         object:render(self.adjacentOffsetX, self.adjacentOffsetY)
     end
 
@@ -262,3 +284,20 @@ function Room:render()
     
     -- love.graphics.setColor(255, 255, 255, 255)
 end
+
+function Room:generateHeart(x, y)
+    local heart = GameObject(
+        GAME_CONSUMABLES_DEFS['heart'],
+        x,
+        y
+    )
+
+    heart.onConsume = function()
+        -- 2 is a full heart
+        self.player:heal(2)
+        gSounds['heart-pickup']:play()
+    end
+
+    table.insert(self.consumables, heart)
+end
+
