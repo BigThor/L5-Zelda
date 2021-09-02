@@ -10,10 +10,13 @@ Player = Class{__includes = Entity}
 
 function Player:init(def)
     Entity.init(self, def)
+    self.pot = nil
 end
 
 function Player:update(dt)
     Entity.update(self, dt)
+
+    self:potFollowPlayer()
 end
 
 function Player:collides(target)
@@ -29,4 +32,16 @@ function Player:render()
     -- love.graphics.setColor(255, 0, 255, 255)
     -- love.graphics.rectangle('line', self.x, self.y, self.width, self.height)
     -- love.graphics.setColor(255, 255, 255, 255)
+end
+
+function Player:potFollowPlayer()
+    if self.pot ~= nil then
+        self.pot.x = self.x
+        self.pot.y = self.y - self.height/2 + 2
+    end
+end
+
+function Player:throwPot()
+    self.pot = nil
+    self:changeState('idle')
 end

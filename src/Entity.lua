@@ -71,13 +71,32 @@ function Entity:heal(points)
     self.health = math.min(self.maxHealth, self.health + points)
 end
 
+
+function Entity:getObjectsCollision(objects)
+    for k, object in pairs(objects) do
+        if self:collides(object) and object.solid then
+            return object
+        end
+    end
+    return nil
+end
+
+function Entity:checkObjectsCollision(objects)
+    for k, object in pairs(objects) do
+        if self:collides(object) and object.solid then
+            return true
+        end
+    end
+    return false
+end
+
 function Entity:goInvulnerable(duration)
     self.invulnerable = true
     self.invulnerableDuration = duration
 end
 
-function Entity:changeState(name)
-    self.stateMachine:change(name)
+function Entity:changeState(name, params)
+    self.stateMachine:change(name, params)
 end
 
 function Entity:changeAnimation(name)

@@ -15,13 +15,14 @@ function Room:init(player)
     self.tiles = {}
     self:generateWallsAndFloors()
 
+    -- game objects in the room
+    self.objects = {}
+    self:generateObjects()
+
     -- entities in the room
     self.entities = {}
     self:generateEntities()
 
-    -- game objects in the room
-    self.objects = {}
-    self:generateObjects()
 
     -- game consumables in the room
     self.consumables = {}
@@ -70,8 +71,15 @@ function Room:generateEntities()
             health = 1
         })
 
+        for k, object in pairs(self.objects) do
+            while object.solid and self.entities[i]:collides(object) do
+                self.entities[i].x = math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
+                VIRTUAL_WIDTH - TILE_SIZE * 2 - 16)
+            end
+        end
+
         self.entities[i].stateMachine = StateMachine {
-            ['walk'] = function() return EntityWalkState(self.entities[i]) end,
+            ['walk'] = function() return EntityWalkState(self.entities[i], self) end,
             ['idle'] = function() return EntityIdleState(self.entities[i]) end
         }
 
@@ -83,6 +91,14 @@ end
     Randomly creates an assortment of obstacles for the player to navigate around.
 ]]
 function Room:generateObjects()
+    self:generateSwitch()
+    local numOfPots = math.random(3) + 2
+    for i = 1, numOfPots do
+        self:generatePot()
+    end
+end
+
+function Room:generateSwitch()
     local switch = GameObject(
         GAME_OBJECT_DEFS['switch'],
         math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
@@ -107,6 +123,27 @@ function Room:generateObjects()
 
     -- add to list of objects in scene (only one switch for now)
     table.insert(self.objects, switch)
+end
+
+
+function Room:generatePot()
+    local x = math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
+        VIRTUAL_WIDTH - TILE_SIZE * 2 - 16)
+    local y = math.random(MAP_RENDER_OFFSET_Y + TILE_SIZE,
+        VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)
+        
+    while x > VIRTUAL_WIDTH/2 - 16 and x < VIRTUAL_WIDTH/2 + 16 and
+          y > VIRTUAL_HEIGHT/2 - 16 and y < VIRTUAL_HEIGHT/2 + 16 do
+        x = math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
+            VIRTUAL_WIDTH - TILE_SIZE * 2 - 16)
+        y = math.random(MAP_RENDER_OFFSET_Y + TILE_SIZE,
+            VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)
+    end
+
+    local pot = GameObject( GAME_OBJECT_DEFS['pot'], x, y )
+
+    -- add to list of objects in scene
+    table.insert(self.objects, pot)
 end
 
 --[[
@@ -224,8 +261,8 @@ function Room:render()
         object:render(self.adjacentOffsetX, self.adjacentOffsetY)
     end
 
-    for k, object in pairs(self.consumables) do
-        object:render(self.adjacentOffsetX, self.adjacentOffsetY)
+    for k, consumable in pairs(self.consumables) do
+        consumable:render(self.adjacentOffsetX, self.adjacentOffsetY)
     end
 
     for k, entity in pairs(self.entities) do
@@ -256,6 +293,12 @@ function Room:render()
     
     if self.player then
         self.player:render()
+    end
+    
+    for k, object in pairs(self.objects) do
+        if object == self.player.pot then
+            object:render(self.adjacentOffsetX, self.adjacentOffsetY)
+        end
     end
 
     love.graphics.setStencilTest()

@@ -6,9 +6,9 @@
     cogden@cs50.harvard.edu
 ]]
 
-PlayerWalkState = Class{__includes = EntityWalkState}
+PlayerWalkPotState = Class{__includes = EntityWalkState}
 
-function PlayerWalkState:init(player, dungeon)
+function PlayerWalkPotState:init(player, dungeon)
     self.entity = player
     self.dungeon = dungeon
 
@@ -17,29 +17,25 @@ function PlayerWalkState:init(player, dungeon)
     self.entity.offsetX = 0
 end
 
-function PlayerWalkState:update(dt)
+function PlayerWalkPotState:update(dt)
     if love.keyboard.isDown('left') then
         self.entity.direction = 'left'
-        self.entity:changeAnimation('walk-left')
+        self.entity:changeAnimation('walk-pot-left')
     elseif love.keyboard.isDown('right') then
         self.entity.direction = 'right'
-        self.entity:changeAnimation('walk-right')
+        self.entity:changeAnimation('walk-pot-right')
     elseif love.keyboard.isDown('up') then
         self.entity.direction = 'up'
-        self.entity:changeAnimation('walk-up')
+        self.entity:changeAnimation('walk-pot-up')
     elseif love.keyboard.isDown('down') then
         self.entity.direction = 'down'
-        self.entity:changeAnimation('walk-down')
+        self.entity:changeAnimation('walk-pot-down')
     else
-        self.entity:changeState('idle')
+        self.entity:changeState('idle-pot')
     end
 
     if love.keyboard.wasPressed('space') then
-        self.entity:changeState('swing-sword')
-    end
-
-    if love.keyboard.wasPressed('q') then
-        self.entity:changeState('lift-pot')
+        self.entity:throwPot()
     end
 
     -- perform base collision detection
@@ -51,63 +47,42 @@ function PlayerWalkState:update(dt)
     -- if we bumped something when checking collision, check any object collisions
     if self.bumped then
         if self.entity.direction == 'left' then
-            
             -- temporarily adjust position into the wall, since bumping pushes outward
             self.entity.x = self.entity.x - PLAYER_WALK_SPEED * dt
-            
-            -- check for colliding into doorway to transition
-            self:checkDoorwayCollision('shift-' .. self.entity.direction)
-
             -- readjust
             self.entity.x = self.entity.x + PLAYER_WALK_SPEED * dt * 2
         elseif self.entity.direction == 'right' then
-            
             -- temporarily adjust position
             self.entity.x = self.entity.x + PLAYER_WALK_SPEED * dt
-            
-            -- check for colliding into doorway to transition
-            self:checkDoorwayCollision('shift-' .. self.entity.direction)
-
             -- readjust
             self.entity.x = self.entity.x - PLAYER_WALK_SPEED * dt * 2
         elseif self.entity.direction == 'up' then
-            
             -- temporarily adjust position
             self.entity.y = self.entity.y - PLAYER_WALK_SPEED * dt
-            
-            self:checkDoorwayCollision('shift-' .. self.entity.direction)
-
             -- readjust
             self.entity.y = self.entity.y + PLAYER_WALK_SPEED * dt * 2
         else
-            
             -- temporarily adjust position
             self.entity.y = self.entity.y + PLAYER_WALK_SPEED * dt
-            
-            -- check for colliding into doorway to transition
-            self:checkDoorwayCollision('shift-' .. self.entity.direction)
-
             -- readjust
             self.entity.y = self.entity.y - PLAYER_WALK_SPEED * dt * 2
         end
     end
 end
 
-function PlayerWalkState:checkDoorwayCollision(direction)
+--[[ function PlayerWalkPotState:checkDoorwayCollision(direction)
     
     for k, doorway in pairs(self.dungeon.currentRoom.doorways) do
         if self.entity:collides(doorway) and doorway.open then
-            self.entity.y = doorway.y + 4
-            self.entity.x = doorway.x + 8
 
             -- shift entity to center of door to avoid phasing through wall
-            if direction == 'shift-down' then
-                self.entity.y = doorway.y - 8
-            elseif direction == 'shift-right' then
-                self.entity.x = doorway.x - 16
+            if direction == 'shift-up' or direction == 'shift-down' then
+                self.entity.y = doorway.y + 4
+            else
+                self.entity.x = doorway.x + 8
             end
 
             Event.dispatch(direction)
         end
     end
-end
+end ]]
