@@ -23,6 +23,9 @@ function Room:init(player)
     self.entities = {}
     self:generateEntities()
 
+    -- entities in the room
+    self.projectiles = {}
+
 
     -- game consumables in the room
     self.consumables = {}
@@ -74,7 +77,7 @@ function Room:generateEntities()
         for k, object in pairs(self.objects) do
             while object.solid and self.entities[i]:collides(object) do
                 self.entities[i].x = math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
-                VIRTUAL_WIDTH - TILE_SIZE * 2 - 16)
+                    VIRTUAL_WIDTH - TILE_SIZE * 2 - 16)
             end
         end
 
@@ -144,6 +147,15 @@ function Room:generatePot()
 
     -- add to list of objects in scene
     table.insert(self.objects, pot)
+end
+
+function Room:generateProjectile(projectileDefinition, projectileParams)
+    local projectile = Projectile(
+        projectileDefinition,
+        projectileParams
+    )
+
+    table.insert(self.projectiles, projectile)
 end
 
 --[[
@@ -239,6 +251,15 @@ function Room:update(dt)
             table.remove(self.consumables, k)
         end
     end
+
+    for k, projectile in pairs(self.projectiles) do
+        projectile:update(dt, self.entities)
+
+        -- trigger collision callback on object
+        --[[ if self.player:collides(object) then
+            object:onCollide()
+        end ]]
+    end
 end
 
 function Room:render()
@@ -267,6 +288,10 @@ function Room:render()
 
     for k, entity in pairs(self.entities) do
         if not entity.dead then entity:render(self.adjacentOffsetX, self.adjacentOffsetY) end
+    end
+    
+    for k, projectile in pairs(self.projectiles) do
+        projectile:render(self.adjacentOffsetX, self.adjacentOffsetY)
     end
 
     -- stencil out the door arches so it looks like the player is going through

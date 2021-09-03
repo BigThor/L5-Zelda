@@ -74,4 +74,7 @@ end
 function PlayerLiftPotState:grabPot(pot)
     pot.solid = false
     self.entity.pot = pot
+    if pot ~= nil then
+        gSounds['pot-lift']:play()
+    end
 end

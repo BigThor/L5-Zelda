@@ -71,10 +71,9 @@ function Entity:heal(points)
     self.health = math.min(self.maxHealth, self.health + points)
 end
 
-
 function Entity:getObjectsCollision(objects)
     for k, object in pairs(objects) do
-        if self:collides(object) and object.solid then
+        if self:collides(object) and object.solid and not object.destroyed then
             return object
         end
     end
@@ -83,7 +82,7 @@ end
 
 function Entity:checkObjectsCollision(objects)
     for k, object in pairs(objects) do
-        if self:collides(object) and object.solid then
+        if self:collides(object) and object.solid and not object.destroyed  then
             return true
         end
     end

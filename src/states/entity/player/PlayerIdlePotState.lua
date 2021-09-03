@@ -1,7 +1,8 @@
 PlayerIdlePotState = Class{__includes = EntityIdleState}
 
-function PlayerIdlePotState:init(entity)
+function PlayerIdlePotState:init(entity, dungeon)
     self.entity = entity
+    self.dungeon = dungeon
 
     self.entity:changeAnimation('idle-pot-' .. self.entity.direction)
 
@@ -23,6 +24,6 @@ function PlayerIdlePotState:update(dt)
     end
 
     if love.keyboard.wasPressed('space') then
-        self.entity:throwPot()
+        self.entity:throwPot(self.dungeon.currentRoom)
     end
 end

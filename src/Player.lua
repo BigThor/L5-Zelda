@@ -16,7 +16,9 @@ end
 function Player:update(dt)
     Entity.update(self, dt)
 
-    self:potFollowPlayer()
+    if self.pot ~= nil then
+        self:potFollowPlayer()
+    end
 end
 
 function Player:collides(target)
@@ -35,13 +37,22 @@ function Player:render()
 end
 
 function Player:potFollowPlayer()
-    if self.pot ~= nil then
-        self.pot.x = self.x
-        self.pot.y = self.y - self.height/2 + 2
-    end
+    self.pot.x = self.x
+    self.pot.y = self.y - self.height/2 + 2
 end
 
-function Player:throwPot()
+function Player:throwPot(room)
+    room:generateProjectile(
+        GAME_PROJECTILE_DEFS['pot'],
+        {
+            direction = self.direction,
+            x = self.x,
+            y = self.y
+        }
+    )
+    local pot = self.pot
+    pot.destroyed = true
     self.pot = nil
     self:changeState('idle')
+    return pot
 end

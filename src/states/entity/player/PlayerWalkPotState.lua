@@ -35,7 +35,7 @@ function PlayerWalkPotState:update(dt)
     end
 
     if love.keyboard.wasPressed('space') then
-        self.entity:throwPot()
+        self.entity:throwPot(self.dungeon.currentRoom)
     end
 
     -- perform base collision detection
