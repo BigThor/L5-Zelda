@@ -25,6 +25,7 @@ function PlayState:init()
         -- rendering and collision offset for spaced sprites
         offsetY = 5
     }
+    self.player:goInvulnerable(1.5)
 
     self.dungeon = Dungeon(self.player)
     self.currentRoom = Room(self.player)

@@ -86,6 +86,7 @@ function Dungeon:beginShifting(shiftX, shiftY)
         -- set everything back to 0, with next room now the current room
         self:finishShifting()
 
+        self.player:goInvulnerable(1.5)
         -- reset player to the correct location in this room, negating off-screen offsets
         if shiftX < 0 then
             self.player.x = MAP_RENDER_OFFSET_X + (MAP_WIDTH * TILE_SIZE) - TILE_SIZE - self.player.width
